@@ -1,0 +1,44 @@
+.toggleDrum {
+  width: 50px;
+  height: 30px;
+  background: white;
+  width: 150px;
+  // min-width: 220px;
+  // height: 460px;
+  // padding: 20px;
+  border: 2px solid black;
+  font-family: 'zeppelin_53bold';
+  line-height: 26px;
+  text-align: center;
+  text-transform: uppercase;
+
+  &.on {
+    background: red;
+  }
+}
+
+.changeDrumLoop {
+  width: 30px;
+  height: 30px;
+  background: white;
+  border: 2px solid black;
+
+  &.on {
+    background: red;
+  }
+}
+
+.Drum {
+  // display: flex;
+  // flex-direction: column;
+
+  .controlsContainer {
+    .controlsRow {
+      display: flex;
+    }
+  }
+}
+
+.drumRack {
+  display: flex;
+}
