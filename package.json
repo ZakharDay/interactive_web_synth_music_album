@@ -6,7 +6,11 @@
     "@rails/activestorage": "^6.0.0",
     "@rails/ujs": "^6.0.0",
     "@rails/webpacker": "4.2.2",
-    "turbolinks": "^5.2.0"
+    "classnames": "^2.2.6",
+    "lodash": "^4.17.19",
+    "tone": "^14.7.39",
+    "turbolinks": "^5.2.0",
+    "unmute-ios-audio": "^3.0.0"
   },
   "version": "0.1.0",
   "devDependencies": {
