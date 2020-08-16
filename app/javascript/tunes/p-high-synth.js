@@ -1,24 +1,22 @@
 import Tone from 'tone'
 
-function metalSynth() {
+function synth() {
   return new Tone.Synth({
-    frequency: 200,
-    envelope: {
-      attack: 0.001,
-      decay: 0.2,
-      sustain: 0.4,
-      release: 0.2
+    oscillator: {
+      type: 'amsquare'
     },
-    harmonicity: 5.1,
-    modulationIndex: 32,
-    resonance: 4000,
-    octaves: 1.5
+    envelope: {
+      attack: 0.03535353535353536,
+      decay: 0.4545454545454546,
+      sustain: 0.696969696969697,
+      release: 0.5757575757575758
+    }
   })
 }
 
 function tremolo() {
   let f = new Tone.Tremolo({
-    frequency: 10,
+    frequency: 0,
     type: 'sine',
     depth: 0.5,
     spread: 180
@@ -32,7 +30,7 @@ function tremolo() {
 function vibrato() {
   let f = new Tone.Vibrato({
     maxDelay: 0.005,
-    frequency: 5,
+    frequency: 0,
     depth: 0.1,
     type: 'sine'
   })
@@ -67,11 +65,11 @@ function jcReverb() {
 
 function distortion() {
   let f = new Tone.Distortion({
-    distortion: 1,
+    distortion: 2.121212121212121,
     oversample: '4x'
   })
 
-  // f.wet.value = 0
+  f.wet.value = 0.24242424242424243
 
   return f
 }
@@ -80,7 +78,7 @@ function part(synth) {
   const v = 1
 
   const part = new Tone.Part(
-    function(time, note) {
+    function (time, note) {
       synth.triggerAttackRelease(
         note.noteName,
         note.duration,
@@ -383,12 +381,4 @@ function part(synth) {
   return part
 }
 
-export {
-  part,
-  metalSynth,
-  tremolo,
-  vibrato,
-  distortion,
-  stereoWidener,
-  jcReverb
-}
+export { part, synth, tremolo, vibrato, distortion, stereoWidener, jcReverb }

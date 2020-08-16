@@ -1,47 +1,43 @@
 import Tone from 'tone'
 
-function distortion() {
-  return new Tone.Distortion({
-    distortion: 0.025,
-    oversample: 'none'
+function synth() {
+  return new Tone.Synth({
+    oscillator: {
+      type: 'pwm',
+      modulationFrequency: 0.6
+    },
+    envelope: {
+      attack: 0.020202020202020204,
+      decay: 0.29292929292929293,
+      sustain: 0.6767676767676768,
+      release: 0.15656565656565657
+    }
   })
-}
-
-function bass() {
-  let b = new Tone.Synth()
-  b.oscillator.type = 'sawtooth'
-  b.oscillator.partials = [0.5, 0.5, 0.5]
-  b.oscillator.phase = 100
-  b.envelope.attack = 0.0
-  b.envelope.decay = 0.1
-  b.envelope.sustain = 0.9
-  b.envelope.release = 0.9
-
-  return b
 }
 
 function autoFilter() {
   let f = new Tone.AutoFilter({
-    frequency: 1,
+    frequency: 75.25252525252526,
     type: 'sine',
-    depth: 1,
-    baseFrequency: 200,
-    octaves: 2.6,
+    depth: 0.6666666666666667,
+    baseFrequency: 186.86868686868686,
+    octaves: 0,
+    // octaves: 1.6363636363636365
     filter: {
       type: 'lowpass',
       rolloff: -12,
-      Q: 1
+      Q: 0
     }
   })
 
-  // f.wet.value = 0
+  f.wet.value = 0.37373737373737376
 
   return f
 }
 
 function part(synth) {
   let part = new Tone.Sequence(
-    function(time, note) {
+    function (time, note) {
       synth.triggerAttackRelease(note, '2n.', time)
     },
     ['F1', 'A1', 'C2', 'E1'],
@@ -51,4 +47,4 @@ function part(synth) {
   return part
 }
 
-export { bass, distortion, part, autoFilter }
+export { synth, autoFilter, part }

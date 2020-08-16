@@ -21,7 +21,13 @@ export default class ToneSynth extends React.Component {
 
   render() {
     const { text, synth, instrument, on, togglePlay } = this.props
+    const { harmonicity, modulationIndex, resonance, octaves } = instrument
+    const { type, sourceType, modulationType, phase } = instrument.oscillator
     const { attack, decay, sustain, release } = instrument.envelope
+
+    const typeSet = ['sine', 'square', 'triangle', 'sawtooth']
+    const sourceTypeSet = ['fm', 'am', 'fat', 'pwm', 'pulse']
+    const modulationTypeSet = ['sine', 'square', 'triangle', 'sawtooth']
 
     return (
       <div className="Synth">
@@ -29,6 +35,45 @@ export default class ToneSynth extends React.Component {
 
         <div className="controlsContainer">
           <div className="controlsRow">
+            <h2>Type</h2>
+            <ButtonSet
+              name={synth}
+              property="oscillator.type"
+              set={typeSet}
+              value={type}
+              handleValueChange={this.handleValueChange}
+            />
+
+            <h2>Source Type</h2>
+            <ButtonSet
+              name={synth}
+              property="oscillator.sourceType"
+              set={sourceTypeSet}
+              value={sourceType}
+              handleValueChange={this.handleValueChange}
+            />
+
+            <h2>Modulation Type</h2>
+            <ButtonSet
+              name={synth}
+              property="oscillator.modulationType"
+              set={modulationTypeSet}
+              value={modulationType}
+              handleValueChange={this.handleValueChange}
+            />
+
+            <h2>Phase</h2>
+            <Slider
+              name={synth}
+              property="oscillator.phase"
+              min="0"
+              max="360"
+              value={phase}
+              handleValueChange={this.handleValueChange}
+            />
+
+            <h2>Envelope</h2>
+
             <h2>Attack</h2>
             <Slider
               name={synth}

@@ -1,14 +1,20 @@
 import Tone from 'tone'
 
-function toneSynth() {
+// The type of the oscillator.
+// Can be any of the basic types: sine, square, triangle, sawtooth.
+// Or prefix the basic types with "fm", "am", or "fat"
+// to use the FMOscillator, AMOscillator or FatOscillator types.
+// The oscillator could also be set to "pwm" or "pulse".
+
+function synth() {
   return new Tone.Synth({
     oscillator: {
-      type: 'sawtooth'
+      type: 'triangle'
     },
     envelope: {
-      attack: 0.006,
-      decay: 0.1,
-      sustain: 0.006,
+      attack: 0.05050505050505051,
+      decay: 0.3888888888888889,
+      sustain: 0.24242424242424243,
       release: 0.006
     }
   })
@@ -16,43 +22,43 @@ function toneSynth() {
 
 function autoFilter() {
   let f = new Tone.AutoFilter({
-    frequency: 6,
+    frequency: 40.40404040404041,
     type: 'sawtooth',
-    depth: 0.7,
-    baseFrequency: 200,
-    octaves: 4,
+    depth: 0.06565656565656566,
+    baseFrequency: 0,
+    octaves: 0,
     filter: {
       type: 'lowpass',
       rolloff: -12,
-      Q: 0.3
+      Q: 0
     }
   })
 
-  f.wet.value = 0.6
+  f.wet.value = 0.494949494949495
 
   return f
 }
 
 function chorus() {
   let f = new Tone.Chorus({
-    frequency: 1,
-    delayTime: 2,
-    depth: 1,
+    frequency: 18.68686868686869,
+    delayTime: 0.000003686868686868687,
+    depth: 0.196969696969697,
     type: 'triangle',
-    spread: 360
+    spread: 30
   })
 
-  f.wet.value = 0.3
+  f.wet.value = 0.5303030303030304
 
   return f
 }
 
 function jcReverb() {
   let f = new Tone.JCReverb({
-    roomSize: 0.84
+    roomSize: 0.36868686868686873
   })
 
-  f.wet.value = 0.3
+  f.wet.value = 0.18686868686868688
 
   return f
 }
@@ -61,7 +67,7 @@ function part(synth) {
   const v = 0.4
 
   const part = new Tone.Part(
-    function(time, note) {
+    function (time, note) {
       synth.triggerAttackRelease(
         note.noteName,
         note.duration,
@@ -109,8 +115,8 @@ function part(synth) {
       {
         time: '1:0:0',
         noteName: 'C4',
-        duration: '0.5m',
-        velocity: 0.6
+        duration: '1n',
+        velocity: v
       },
       {
         time: '1:2:0',
@@ -169,4 +175,4 @@ function part(synth) {
   return part
 }
 
-export { part, toneSynth, autoFilter, chorus, jcReverb }
+export { part, synth, autoFilter, chorus, jcReverb }

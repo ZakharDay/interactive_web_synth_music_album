@@ -49,9 +49,9 @@ import PolySynth from '../components/synths/PolySynth'
 let bpm = 90
 const defaultWetValue = 1
 
-let bassSynthChannel = utilities.channel(-4)
-let lightSynthChannel = utilities.channel(-11)
-let soloSynthChannel = utilities.channel(-7)
+let bassSynthChannel = utilities.channel(-15)
+let lightSynthChannel = utilities.channel(-14)
+let soloSynthChannel = utilities.channel(-10)
 let highSynthChannel = utilities.channel(-8)
 
 let kickDrum = drums.kickDrum()
@@ -101,26 +101,25 @@ lightSynth.chain(
   lightSynthChannel
 )
 
-let bassSynth = bassSynthTunes.bass()
+let bassSynth = bassSynthTunes.synth()
 let bassSynthFilter = bassSynthTunes.autoFilter()
-let bassSynthDistortion = bassSynthTunes.distortion()
 let bassSynthPart = bassSynthTunes.part(bassSynth)
-bassSynth.chain(bassSynthFilter, bassSynthDistortion, bassSynthChannel)
+bassSynth.chain(bassSynthFilter, bassSynthChannel)
 
-let soloSynth = soloSynthTunes.toneSynth()
+let soloSynth = soloSynthTunes.synth()
+let soloSynthFilter = soloSynthTunes.autoFilter()
 let soloSynthChorus = soloSynthTunes.chorus()
 let soloSynthReverb = soloSynthTunes.jcReverb()
-let soloSynthFilter = soloSynthTunes.autoFilter()
 let soloSynthPart = soloSynthTunes.part(soloSynth)
 
 soloSynth.chain(
+  soloSynthFilter,
   soloSynthChorus,
   soloSynthReverb,
-  soloSynthFilter,
   soloSynthChannel
 )
 
-let highSynth = highSynthTunes.metalSynth()
+let highSynth = highSynthTunes.synth()
 let highSynthTremolo = highSynthTunes.tremolo()
 let highSynthVibrato = highSynthTunes.vibrato()
 let highSynthDistortion = highSynthTunes.distortion()
@@ -190,12 +189,6 @@ export default class Performance extends React.Component {
       bassSynth,
       soloSynth,
       highSynth,
-      bassSynthDistortion: {
-        name: 'bassSynthDistortion',
-        effect: bassSynthDistortion,
-        wet: bassSynthDistortion.wet.value,
-        on: true
-      },
       bassSynthFilter: {
         name: 'bassSynthFilter',
         effect: bassSynthFilter,
@@ -236,6 +229,12 @@ export default class Performance extends React.Component {
         mute: false,
         solo: false
       },
+      soloSynthFilter: {
+        name: 'soloSynthFilter',
+        effect: soloSynthFilter,
+        wet: soloSynthFilter.wet.value,
+        on: true
+      },
       soloSynthChorus: {
         name: 'soloSynthChorus',
         effect: soloSynthChorus,
@@ -246,12 +245,6 @@ export default class Performance extends React.Component {
         name: 'soloSynthReverb',
         effect: soloSynthReverb,
         wet: soloSynthReverb.wet.value,
-        on: true
-      },
-      soloSynthFilter: {
-        name: 'soloSynthFilter',
-        effect: soloSynthFilter,
-        wet: soloSynthFilter.wet.value,
         on: true
       },
       soloSynthChannel: {
@@ -266,7 +259,7 @@ export default class Performance extends React.Component {
         name: 'highSynthTremolo',
         effect: highSynthTremolo,
         wet: highSynthTremolo.wet.value,
-        on: true
+        on: false
       },
       highSynthVibrato: {
         name: 'highSynthVibrato',
@@ -301,6 +294,7 @@ export default class Performance extends React.Component {
     const p = Tone.Transport.position
     const regexBefore = /([\w]+)/
     let measure = p.match(regexBefore)[1]
+    console.log('Next measure ' + measure)
 
     switch (measure) {
       case '0':
@@ -480,7 +474,7 @@ export default class Performance extends React.Component {
   handleStart() {
     unmuteAudio()
     Tone.Transport.bpm.value = bpm
-    Tone.Transport.scheduleRepeat(this.nextMeasure, '1m')
+    // Tone.Transport.scheduleRepeat(this.nextMeasure, '1m')
     Tone.Transport.start()
 
     this.state.drums.kick.parts.map((part) => {
@@ -696,17 +690,21 @@ export default class Performance extends React.Component {
     let synth = this.state[synthName]
     let effectNameNamespace = effectName.match(regexBefore)[1]
     let effectNameInNamespace = effectName.match(regexAfter)[1]
-    // let { envelope, oscillator } = synth.instrument
+    // let { envelope, oscillator } = synth //.instrument
+    // console.log('test', synthName, synth)
     // let { envelope } = synth
-    // console.log('test', effectName, effectName.match(regexAfter))
 
-    if (synthName == 'leadSynth') {
+    if (synthName == 'lightSynth') {
       if (effectNameNamespace == 'oscillator') {
         synth.voices[0].oscillator[effectNameInNamespace] = value
       } else if (effectNameNamespace == 'envelope') {
         synth.voices[0].envelope[effectNameInNamespace] = value
       }
-    } else if (synthName == 'bassSynth') {
+    } else if (
+      synthName == 'bassSynth' ||
+      synthName == 'soloSynth' ||
+      synthName == 'highSynth'
+    ) {
       if (effectNameNamespace == 'oscillator') {
         synth.oscillator[effectNameInNamespace] = value
       } else if (effectNameNamespace == 'envelope') {
@@ -772,7 +770,7 @@ export default class Performance extends React.Component {
   }
 
   changeChannelValue(channelName, valueName, value) {
-    console.log(channelName, valueName, value)
+    // console.log(channelName, valueName, value)
     let { name, channel, pan, volume, mute, solo } = this.state[channelName]
     let shouldComponentUpdate = false
 
@@ -960,12 +958,6 @@ export default class Performance extends React.Component {
             togglePlay=""
             changeSynthValue={this.changeSynthValue}
           />
-          <Distortion
-            {...this.state.bassSynthDistortion}
-            toggleEffect={() => this.toggleEffect('bassSynthDistortion')}
-            changeEffectWetValue={this.changeEffectWetValue}
-            changeEffectValue={this.changeEffectValue}
-          />
           <AutoFilter
             {...this.state.bassSynthFilter}
             toggleEffect={() => this.toggleEffect('bassSynthFilter')}
@@ -988,6 +980,12 @@ export default class Performance extends React.Component {
             togglePlay=""
             changeSynthValue={this.changeSynthValue}
           />
+          <AutoFilter
+            {...this.state.soloSynthFilter}
+            toggleEffect={() => this.toggleEffect('soloSynthFilter')}
+            changeEffectWetValue={this.changeEffectWetValue}
+            changeEffectValue={this.changeEffectValue}
+          />
           <Chorus
             {...this.state.soloSynthChorus}
             toggleEffect={() => this.toggleEffect('soloSynthChorus')}
@@ -997,12 +995,6 @@ export default class Performance extends React.Component {
           <JcReverb
             {...this.state.soloSynthReverb}
             toggleEffect={() => this.toggleEffect('soloSynthReverb')}
-            changeEffectWetValue={this.changeEffectWetValue}
-            changeEffectValue={this.changeEffectValue}
-          />
-          <AutoFilter
-            {...this.state.soloSynthFilter}
-            toggleEffect={() => this.toggleEffect('soloSynthFilter')}
             changeEffectWetValue={this.changeEffectWetValue}
             changeEffectValue={this.changeEffectValue}
           />
