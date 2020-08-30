@@ -3,7 +3,7 @@ import Tone from 'tone'
 function synth() {
   return new Tone.Synth({
     oscillator: {
-      type: 'amsquare'
+      type: 'pwm'
     },
     envelope: {
       attack: 0.03535353535353536,
@@ -12,6 +12,26 @@ function synth() {
       release: 0.5757575757575758
     }
   })
+}
+
+function autoFilter() {
+  let f = new Tone.AutoFilter({
+    frequency: 75.25252525252526,
+    type: 'sine',
+    depth: 0.6666666666666667,
+    baseFrequency: 489,
+    octaves: 0,
+    // octaves: 1.6363636363636365
+    filter: {
+      type: 'lowpass',
+      rolloff: -12,
+      Q: 0
+    }
+  })
+
+  f.wet.value = 0.8333333333333334
+
+  return f
 }
 
 function tremolo() {
@@ -381,4 +401,13 @@ function part(synth) {
   return part
 }
 
-export { part, synth, tremolo, vibrato, distortion, stereoWidener, jcReverb }
+export {
+  synth,
+  autoFilter,
+  tremolo,
+  vibrato,
+  distortion,
+  stereoWidener,
+  jcReverb,
+  part
+}

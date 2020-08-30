@@ -32,7 +32,9 @@
   }
 
   .controlsContainer {
+    height: 538px;
     padding: 10px;
+    overflow-y: scroll;
 
     .controlsRow {
       padding: 15px 0;

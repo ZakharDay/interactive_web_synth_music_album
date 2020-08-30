@@ -66,15 +66,6 @@ kickDrum.connect(convolver)
 snareMembrane.chain(snareEQ)
 snareHit.chain(snareEQ)
 
-// let kickAnalyser = new Tone.FFT()
-// let snareAnalyser = new Tone.FFT()
-// kickDrum.connect(kickAnalyser)
-// snareHit.connect(snareAnalyser)
-
-// let drumLoop1Kick
-// let drumLoop1Snare
-// let drumLoop1Hat
-
 let drumLoop1Kick = drumLoops.kick1(kickDrum)
 let drumLoop1Snare = drumLoops.snare1(snareHit, snareMembrane)
 let drumLoop1Hat = drumLoops.hat1(highhat)
@@ -88,7 +79,7 @@ let drumLoop3Hat = drumLoops.hat3(highhat)
 
 let drumLoop4Kick = drumLoops.kick4(kickDrum)
 
-let lightSynth = lightSynthTunes.polySynth()
+let lightSynth = lightSynthTunes.synth()
 let lightSynthFilter = lightSynthTunes.autoFilter()
 let lightSynthReverb = lightSynthTunes.jcReverb()
 let lightSynthChorus = lightSynthTunes.chorus()
@@ -120,12 +111,14 @@ soloSynth.chain(
 )
 
 let highSynth = highSynthTunes.synth()
+let highSynthFilter = highSynthTunes.autoFilter()
 let highSynthTremolo = highSynthTunes.tremolo()
 let highSynthVibrato = highSynthTunes.vibrato()
 let highSynthDistortion = highSynthTunes.distortion()
 let highSynthPart = highSynthTunes.part(highSynth)
 
 highSynth.chain(
+  highSynthFilter,
   highSynthTremolo,
   highSynthVibrato,
   highSynthDistortion,
@@ -151,6 +144,7 @@ export default class Performance extends React.Component {
       'toggleDrum',
       'changeDrumLoop',
       'changeSynthValue',
+      'setupEffect',
       'toggleEffect',
       'changeEffectWetValue',
       'changeEffectValue',
@@ -213,13 +207,13 @@ export default class Performance extends React.Component {
         name: 'lightSynthReverb',
         effect: lightSynthReverb,
         wet: lightSynthReverb.wet.value,
-        on: true
+        on: false
       },
       lightSynthChorus: {
         name: 'lightSynthChorus',
         effect: lightSynthChorus,
         wet: lightSynthChorus.wet.value,
-        on: true
+        on: false
       },
       lightSynthChannel: {
         name: 'lightSynthChannel',
@@ -255,6 +249,12 @@ export default class Performance extends React.Component {
         mute: false,
         solo: false
       },
+      highSynthFilter: {
+        name: 'highSynthFilter',
+        effect: highSynthFilter,
+        wet: highSynthFilter.wet.value,
+        on: true
+      },
       highSynthTremolo: {
         name: 'highSynthTremolo',
         effect: highSynthTremolo,
@@ -287,6 +287,17 @@ export default class Performance extends React.Component {
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeydown)
     document.addEventListener('keyup', this.handleKeyup)
+
+    this.setupEffect('bassSynthFilter')
+    this.setupEffect('lightSynthFilter')
+    this.setupEffect('lightSynthReverb')
+    this.setupEffect('lightSynthChorus')
+    this.setupEffect('soloSynthFilter')
+    this.setupEffect('soloSynthChorus')
+    this.setupEffect('soloSynthReverb')
+    this.setupEffect('highSynthTremolo')
+    this.setupEffect('highSynthVibrato')
+    this.setupEffect('highSynthDistortion')
   }
 
   nextMeasure(now) {
@@ -685,26 +696,47 @@ export default class Performance extends React.Component {
   }
 
   changeSynthValue(synthName, effectName, value) {
-    let regexBefore = /(.*)\./
-    let regexAfter = /\.(.*)/
+    // console.log('test', synthName, effectName, value)
+
     let synth = this.state[synthName]
-    let effectNameNamespace = effectName.match(regexBefore)[1]
-    let effectNameInNamespace = effectName.match(regexAfter)[1]
-    // let { envelope, oscillator } = synth //.instrument
-    // console.log('test', synthName, synth)
-    // let { envelope } = synth
 
     if (synthName == 'lightSynth') {
+      let regexBefore = /(.*)\./
+      let regexAfter = /\.(.*)/
+      let regexArrayKey = /\[([0-9]+)\]/
+      let regexDropArrayKey = /\](.*)/
+
+      let effectNameNamespace = effectName
+        .match(regexBefore)[1]
+        .match(regexDropArrayKey)[1]
+      let effectNameInNamespace = effectName.match(regexAfter)[1]
+      let arrayKey = parseInt(
+        effectName.match(regexBefore)[1].match(regexArrayKey)[1]
+      )
+
       if (effectNameNamespace == 'oscillator') {
-        synth.voices[0].oscillator[effectNameInNamespace] = value
+        // synth.voices.forEach((voice) => {
+        //   voice.oscillator[effectNameInNamespace] = value
+        // })
+
+        synth.voices[arrayKey].oscillator[effectNameInNamespace] = value
       } else if (effectNameNamespace == 'envelope') {
-        synth.voices[0].envelope[effectNameInNamespace] = value
+        synth.voices.forEach((voice) => {
+          voice.envelope[effectNameInNamespace] = value
+        })
+
+        // synth.voices[arrayKey].envelope[effectNameInNamespace] = value
       }
     } else if (
       synthName == 'bassSynth' ||
       synthName == 'soloSynth' ||
       synthName == 'highSynth'
     ) {
+      let regexBefore = /(.*)\./
+      let regexAfter = /\.(.*)/
+      let effectNameNamespace = effectName.match(regexBefore)[1]
+      let effectNameInNamespace = effectName.match(regexAfter)[1]
+
       if (effectNameNamespace == 'oscillator') {
         synth.oscillator[effectNameInNamespace] = value
       } else if (effectNameNamespace == 'envelope') {
@@ -716,6 +748,21 @@ export default class Performance extends React.Component {
 
     this.setState({
       [`${synthName}`]: synth
+    })
+  }
+
+  setupEffect(effectName) {
+    let { name, effect, wet, on } = this.state[effectName]
+
+    effect.wet.value = on == true ? wet : 0
+
+    this.setState({
+      [`${effectName}`]: {
+        name,
+        effect,
+        wet,
+        on
+      }
     })
   }
 
@@ -757,7 +804,30 @@ export default class Performance extends React.Component {
       value = Math.round(value)
     }
 
-    effect[effectProperty] = value
+    let regexBefore = /(.*)\./
+    let regexAfter = /\.(.*)/
+    let effectPropertyNamespaceRegexResult = effectProperty.match(regexBefore)
+
+    console.log(effectName, effectProperty, value)
+
+    if (effectPropertyNamespaceRegexResult != null) {
+      let effectPropertyNamespace = effectProperty.match(regexBefore)[1]
+      let effectPropertyInNamespace = effectProperty.match(regexAfter)[1]
+
+      console.log(
+        effectPropertyNamespaceRegexResult,
+        effectPropertyNamespace,
+        effect[effectPropertyNamespace]
+      )
+
+      if (effectPropertyNamespace == 'filter') {
+        effect.filter[effectPropertyInNamespace] = value
+      } else {
+        effect[effectPropertyNamespace].value = value
+      }
+    } else {
+      effect[effectProperty] = value
+    }
 
     this.setState({
       [`${effectName}`]: {
@@ -829,11 +899,11 @@ export default class Performance extends React.Component {
   }
 
   toggleNote(note) {
-    highSynth.triggerAttack(note, '16n')
+    lightSynth.triggerAttack(note, '16n')
   }
 
   stopNote() {
-    highSynth.triggerRelease()
+    lightSynth.triggerRelease()
   }
 
   render() {
@@ -1013,6 +1083,12 @@ export default class Performance extends React.Component {
             on=""
             togglePlay=""
             changeSynthValue={this.changeSynthValue}
+          />
+          <AutoFilter
+            {...this.state.highSynthFilter}
+            toggleEffect={() => this.toggleEffect('highSynthFilter')}
+            changeEffectWetValue={this.changeEffectWetValue}
+            changeEffectValue={this.changeEffectValue}
           />
           <Tremolo
             {...this.state.highSynthTremolo}

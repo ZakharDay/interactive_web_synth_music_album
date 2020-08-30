@@ -11,7 +11,7 @@ import ButtonSet from '../controls/ButtonSet'
 export default class PolySynth extends React.Component {
   constructor(props) {
     super(props)
-    _.bindAll(this, 'handleValueChange')
+    _.bindAll(this, 'handleValueChange', 'renderSynth')
   }
 
   handleValueChange(name, property, value) {
@@ -19,94 +19,102 @@ export default class PolySynth extends React.Component {
     changeSynthValue(name, property, value)
   }
 
-  render() {
+  renderSynth(s, i) {
+    const { synth } = this.props
     const typeSet = ['sine', 'square', 'triangle', 'sawtooth', 'fatsawtooth']
-    // prettier-ignore
-    const curveSet = ['linear', 'exponential', 'sine', 'cosine', 'bounce', 'ripple', 'step']
+    const { type, count, spread, phase, fadeIn } = s.oscillator
+    const { attack, decay, sustain, release, attackCurve } = s.envelope
+
+    return (
+      <div className="controlsRow" key={i}>
+        <h2>Oscillator</h2>
+
+        <h2>Type</h2>
+        <ButtonSet
+          name={synth}
+          property={'[' + i + ']oscillator.type'}
+          set={typeSet}
+          value={type}
+          handleValueChange={this.handleValueChange}
+        />
+
+        <h2>Count</h2>
+        <Slider
+          name={synth}
+          property={'[' + i + ']oscillator.count'}
+          min="0"
+          max="10"
+          value={count}
+          handleValueChange={this.handleValueChange}
+        />
+
+        <h2>Spread</h2>
+        <Slider
+          name={synth}
+          property={'[' + i + ']oscillator.spread'}
+          min="0"
+          max="100"
+          value={spread}
+          handleValueChange={this.handleValueChange}
+        />
+
+        <h2>Phase</h2>
+        <Slider
+          name={synth}
+          property={'[' + i + ']oscillator.phase'}
+          min="0"
+          max="10"
+          value={phase}
+          handleValueChange={this.handleValueChange}
+        />
+
+        <h2>Fade In</h2>
+        <Slider
+          name={synth}
+          property={'[' + i + ']oscillator.fadeIn'}
+          min="0"
+          max="10"
+          value={fadeIn}
+          handleValueChange={this.handleValueChange}
+        />
+      </div>
+    )
+  }
+
+  render() {
     const { text, synth, instrument, on, togglePlay } = this.props
-    // console.log(synth, instrument)
-
-    const {
-      type,
-      count,
-      spread,
-      phase,
-      fadeIn
-    } = instrument.voices[0].oscillator
-
-    // console.log(type, count, spread)
 
     const {
       attack,
       decay,
       sustain,
       release,
-      attackCurve
+      attackCurve,
+      decayCurve,
+      releaseCurve
     } = instrument.voices[0].envelope
+
+    // prettier-ignore
+    const curveSet = ['linear', 'exponential', 'sine', 'cosine', 'bounce', 'ripple', 'step']
+    const decayCurveSet = ['linear', 'exponential']
+
+    let synthsElements = instrument.voices.map((s, i) => {
+      return this.renderSynth(s, i)
+    })
 
     return (
       <div className="Synth">
         <ToggleButton text={text} on={on} handleClick={togglePlay} />
-
         <div className="controlsContainer">
+          {synthsElements}
+
           <div className="controlsRow">
-            <h2>Oscillator</h2>
-
-            <h2>Type</h2>
-            <ButtonSet
-              name={name}
-              property="oscillator.type"
-              set={typeSet}
-              value={type}
-              handleValueChange={this.handleValueChange}
-            />
-
-            <h2>Count</h2>
-            <Slider
-              name={synth}
-              property="oscillator.count"
-              min="0"
-              max="10"
-              value={count}
-              handleValueChange={this.handleValueChange}
-            />
-
-            <h2>Spread</h2>
-            <Slider
-              name={synth}
-              property="oscillator.spread"
-              min="0"
-              max="100"
-              value={spread}
-              handleValueChange={this.handleValueChange}
-            />
-
-            <h2>Phase</h2>
-            <Slider
-              name={synth}
-              property="oscillator.phase"
-              min="0"
-              max="10"
-              value={phase}
-              handleValueChange={this.handleValueChange}
-            />
-
-            <h2>Fade In</h2>
-            <Slider
-              name={synth}
-              property="oscillator.fadeIn"
-              min="0"
-              max="10"
-              value={fadeIn}
-              handleValueChange={this.handleValueChange}
-            />
-
             <h2>Envelope</h2>
 
             <h2>Attack</h2>
             <Slider
               name={synth}
-              property="envelope.attack"
+              property={'[0]envelope.attack'}
               min="0"
               max="1"
               value={attack}
@@ -116,7 +124,7 @@ export default class PolySynth extends React.Component {
             <h2>Decay</h2>
             <Slider
               name={synth}
-              property="envelope.decay"
+              property={'[0]envelope.decay'}
               min="0"
               max="1"
               value={decay}
@@ -126,7 +134,7 @@ export default class PolySynth extends React.Component {
             <h2>Sustain</h2>
             <Slider
               name={synth}
-              property="envelope.sustain"
+              property={'[0]envelope.sustain'}
               min="0"
               max="1"
               value={sustain}
@@ -136,7 +144,7 @@ export default class PolySynth extends React.Component {
             <h2>Release</h2>
             <Slider
               name={synth}
-              property="envelope.release"
+              property={'[0]envelope.release'}
               min="0"
               max="10"
               value={release}
@@ -145,10 +153,28 @@ export default class PolySynth extends React.Component {
 
             <h2>Attack Curve</h2>
             <ButtonSet
-              name={name}
-              property="envelope.attackCurve"
+              name={synth}
+              property={'[0]envelope.attackCurve'}
               set={curveSet}
               value={attackCurve}
+              handleValueChange={this.handleValueChange}
+            />
+
+            <h2>Decay Curve</h2>
+            <ButtonSet
+              name={synth}
+              property={'[0]envelope.decayCurve'}
+              set={decayCurveSet}
+              value={decayCurve}
+              handleValueChange={this.handleValueChange}
+            />
+
+            <h2>Release Curve</h2>
+            <ButtonSet
+              name={synth}
+              property={'[0]envelope.releaseCurve'}
+              set={curveSet}
+              value={releaseCurve}
               handleValueChange={this.handleValueChange}
             />
           </div>

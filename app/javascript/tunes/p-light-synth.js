@@ -1,30 +1,65 @@
 import Tone from 'tone'
 
-function polySynth() {
-  return new Tone.PolySynth(3, Tone.Synth, {
-    oscillator: {
-      type: 'fatsawtooth',
-      count: 7,
-      spread: 30,
-      phase: 80,
-      fadeIn: 0.3
-    },
+function synth() {
+  let s = new Tone.PolySynth(3, Tone.Synth, {
     envelope: {
-      attack: 0.12626262626262627,
-      decay: 0.393939393939394,
-      sustain: 0.8,
-      release: 5,
-      attackCurve: 'exponential'
+      attack: 0.196969696969697,
+      decay: 0.5757575757575758,
+      sustain: 0.7727272727272728,
+      release: 2.474747474747475,
+      attackCurve: 'ripple',
+      decayCurve: 'exponential',
+      releaseCurve: 'exponential'
     }
   })
+
+  const voiceSettings = [
+    {
+      oscillator: {
+        type: 'fatsawtooth',
+        count: 2.0707070707070705,
+        spread: 12.626262626262626,
+        phase: 5.2020202020202015,
+        fadeIn: 0.3
+      }
+    },
+    {
+      oscillator: {
+        type: 'fatsawtooth',
+        count: 9,
+        spread: 25.252525252525253,
+        phase: 10,
+        fadeIn: 0.3
+      }
+    },
+    {
+      oscillator: {
+        type: 'fatsawtooth',
+        count: 9,
+        spread: 9.595959595959597,
+        phase: 2.0202020202020203,
+        fadeIn: 0.3
+      }
+    }
+  ]
+
+  s.voices.forEach((voice, i) => {
+    s.voices[i].oscillator.type = voiceSettings[i].oscillator.type
+    s.voices[i].oscillator.count = voiceSettings[i].oscillator.count
+    s.voices[i].oscillator.spread = voiceSettings[i].oscillator.spread
+    s.voices[i].oscillator.phase = voiceSettings[i].oscillator.phase
+    s.voices[i].oscillator.fadeIn = voiceSettings[i].oscillator.fadeIn
+  })
+
+  return s
 }
 
 function autoFilter() {
   let f = new Tone.AutoFilter({
-    frequency: 1,
-    type: 'triangle',
+    frequency: 73.23232323232324,
+    type: 'sawtooth',
     depth: 1,
-    baseFrequency: 520.2020202020202,
+    baseFrequency: 616.1616161616162,
     octaves: 2.6,
     filter: {
       type: 'lowpass',
@@ -33,7 +68,7 @@ function autoFilter() {
     }
   })
 
-  f.wet.value = 0.5353535353535354
+  f.wet.value = 0.9494949494949496
 
   return f
 }
@@ -63,8 +98,8 @@ function jcReverb() {
 }
 
 function introPart(synth) {
-  const v = 0.2
-  const d = '4n'
+  const v = 1
+  const d = '1n'
 
   const part = new Tone.Part(
     function (time, note) {
@@ -161,4 +196,4 @@ function introPart(synth) {
   return part
 }
 
-export { introPart, polySynth, autoFilter, chorus, jcReverb }
+export { synth, autoFilter, chorus, jcReverb, introPart }
