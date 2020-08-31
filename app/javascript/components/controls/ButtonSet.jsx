@@ -11,7 +11,7 @@ export default class ButtonSet extends React.Component {
     let { name, property, set, value, handleValueChange } = this.props
     let buttons = []
 
-    set.map((option, i) => {
+    set.forEach((option, i) => {
       buttons.push(
         <Button
           name={name}

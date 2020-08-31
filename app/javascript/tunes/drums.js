@@ -1,4 +1,4 @@
-import Tone from 'tone'
+import * as Tone from 'tone'
 
 function kickDrum() {
   return new Tone.MembraneSynth()

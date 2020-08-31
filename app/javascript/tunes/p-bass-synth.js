@@ -1,4 +1,4 @@
-import Tone from 'tone'
+import * as Tone from 'tone'
 
 function synth() {
   return new Tone.Synth({

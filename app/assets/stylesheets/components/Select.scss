@@ -1,0 +1,51 @@
+.Select {
+  position: relative;
+  border: 1px solid black;
+  font-size: 10px;
+
+  &.opened {
+    .current {
+      background: lightgrey;
+    }
+  }
+
+  .current {
+    padding: 10px;
+
+    &::after {
+      content: 'V';
+      display: block;
+      position: absolute;
+      right: 10px;
+      top: 10px;
+    }
+  }
+
+  .options {
+    position: absolute;
+    z-index: 99;
+    left: -1px;
+    width: calc(100% + 2px);
+    height: 172px;
+    border: 1px solid black;
+    overflow: hidden;
+
+    .wrapper {
+      width: calc(100% + 20px);
+      height: 172px;
+      overflow-y: scroll;
+    }
+
+    .Button {
+      padding: 10px;
+      margin: 0;
+      border-top: none;
+      border-right: none;
+      border-left: none;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+}

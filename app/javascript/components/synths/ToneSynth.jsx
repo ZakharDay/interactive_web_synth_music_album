@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React from 'react'
-import Tone from 'tone'
+import * as Tone from 'tone'
 
 import PlaySwitch from '../controls/PlaySwitch'
 import ToggleButton from '../controls/ToggleButton'

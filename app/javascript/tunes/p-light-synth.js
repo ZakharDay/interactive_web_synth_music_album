@@ -1,7 +1,16 @@
-import Tone from 'tone'
+import * as Tone from 'tone'
 
 function synth() {
-  let s = new Tone.PolySynth(3, Tone.Synth, {
+  return new Tone.PolySynth(Tone.Synth, {
+    portamento: 0,
+    detune: 100,
+    oscillator: {
+      type: 'fatsawtooth',
+      count: 3,
+      spread: 12.626262626262626,
+      phase: 5.2020202020202015,
+      fadeIn: 0.3
+    },
     envelope: {
       attack: 0.196969696969697,
       decay: 0.5757575757575758,
@@ -12,46 +21,6 @@ function synth() {
       releaseCurve: 'exponential'
     }
   })
-
-  const voiceSettings = [
-    {
-      oscillator: {
-        type: 'fatsawtooth',
-        count: 2.0707070707070705,
-        spread: 12.626262626262626,
-        phase: 5.2020202020202015,
-        fadeIn: 0.3
-      }
-    },
-    {
-      oscillator: {
-        type: 'fatsawtooth',
-        count: 9,
-        spread: 25.252525252525253,
-        phase: 10,
-        fadeIn: 0.3
-      }
-    },
-    {
-      oscillator: {
-        type: 'fatsawtooth',
-        count: 9,
-        spread: 9.595959595959597,
-        phase: 2.0202020202020203,
-        fadeIn: 0.3
-      }
-    }
-  ]
-
-  s.voices.forEach((voice, i) => {
-    s.voices[i].oscillator.type = voiceSettings[i].oscillator.type
-    s.voices[i].oscillator.count = voiceSettings[i].oscillator.count
-    s.voices[i].oscillator.spread = voiceSettings[i].oscillator.spread
-    s.voices[i].oscillator.phase = voiceSettings[i].oscillator.phase
-    s.voices[i].oscillator.fadeIn = voiceSettings[i].oscillator.fadeIn
-  })
-
-  return s
 }
 
 function autoFilter() {

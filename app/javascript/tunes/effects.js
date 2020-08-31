@@ -1,4 +1,4 @@
-import Tone from 'tone'
+import * as Tone from 'tone'
 
 function autoFilter() {
   let f = new Tone.AutoFilter({

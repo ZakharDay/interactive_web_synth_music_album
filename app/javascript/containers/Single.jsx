@@ -1,6 +1,6 @@
 import _, { merge } from 'lodash'
 import React from 'react'
-import Tone from 'tone'
+import * as Tone from 'tone'
 let unmuteAudio = require('unmute-ios-audio')
 
 import * as drums from '../tunes/drums'
@@ -59,10 +59,10 @@ let snareHit = drums.snareHit()
 let highhat = drums.highhat().toMaster()
 let snareMembrane = drums.snareMembrane()
 let snareEQ = new Tone.EQ3(-10, 0, -10).toMaster()
-let convolver = new Tone.Convolver(samples.hall).toMaster()
-
-convolver.wet.value = 0.1
-kickDrum.connect(convolver)
+// let convolver = new Tone.Convolver(samples.hall).toMaster()
+//
+// convolver.wet.value = 0.1
+// kickDrum.connect(convolver)
 snareMembrane.chain(snareEQ)
 snareHit.chain(snareEQ)
 
@@ -84,6 +84,8 @@ let lightSynthFilter = lightSynthTunes.autoFilter()
 let lightSynthReverb = lightSynthTunes.jcReverb()
 let lightSynthChorus = lightSynthTunes.chorus()
 let lightSynthPart = lightSynthTunes.introPart(lightSynth)
+
+console.log(lightSynth.get())
 
 lightSynth.chain(
   lightSynthFilter,
@@ -488,34 +490,35 @@ export default class Performance extends React.Component {
     // Tone.Transport.scheduleRepeat(this.nextMeasure, '1m')
     Tone.Transport.start()
 
-    this.state.drums.kick.parts.map((part) => {
-      part.mute = true
-      part.start()
-    })
-
-    this.state.drums.snare.parts.map((part) => {
-      part.mute = true
-      part.start()
-    })
-
-    this.state.drums.hat.parts.map((part) => {
-      part.mute = true
-      part.start()
-    })
+    // this.state.drums.kick.parts.map((part) => {
+    //   part.mute = true
+    //   part.start()
+    // })
+    //
+    // this.state.drums.snare.parts.map((part) => {
+    //   part.mute = true
+    //   part.start()
+    // })
+    //
+    // this.state.drums.hat.parts.map((part) => {
+    //   part.mute = true
+    //   part.start()
+    // })
 
     lightSynthPart.mute = true
-    bassSynthPart.mute = true
-    soloSynthPart.mute = true
-    highSynthPart.mute = true
+    // bassSynthPart.mute = true
+    // soloSynthPart.mute = true
+    // highSynthPart.mute = true
 
     lightSynthPart.start()
-    bassSynthPart.start()
-    soloSynthPart.start()
-    highSynthPart.start()
+    // bassSynthPart.start()
+    // soloSynthPart.start()
+    // highSynthPart.start()
 
-    this.setupDrums('kick')
-    this.setupDrums('snare')
-    this.setupDrums('hat')
+    // this.setupDrums('kick')
+    // this.setupDrums('snare')
+    // this.setupDrums('hat')
+    unmuteAudio()
   }
 
   handleKeydown(e) {
@@ -876,15 +879,23 @@ export default class Performance extends React.Component {
 
   toggleChannelValue(channelName, valueName) {
     let { name, channel, pan, volume, mute, solo } = this.state[channelName]
-    channel[valueName] = !channel[valueName]
+    // channel[valueName] = !channel[valueName]
+
+    console.log('value', channel[valueName], 'muted', channel.muted)
+    console.log('mute', mute, 'solo', solo)
 
     if (valueName == 'mute') {
+      channel.mute = !mute
       mute = !mute
     }
 
     if (valueName == 'solo') {
+      channel.solo = !solo
       solo = !solo
     }
+
+    console.log('value', channel[valueName], 'muted', channel.muted)
+    console.log('mute', mute, 'solo', solo)
 
     this.setState({
       [`${channelName}`]: {
@@ -944,45 +955,6 @@ export default class Performance extends React.Component {
             toggleDrum={this.toggleDrum}
             changeDrumLoop={this.changeDrumLoop}
           />
-
-          <div className="Drum">
-            <div className="controlsContainer">
-              <div className="controlsRow">
-                <div
-                  className="changeDrumLoop"
-                  onClick={() => this.toggleNote('C1')}
-                ></div>
-                <div
-                  className="changeDrumLoop"
-                  onClick={() => this.toggleNote('D1')}
-                ></div>
-                <div
-                  className="changeDrumLoop"
-                  onClick={() => this.toggleNote('E1')}
-                ></div>
-                <div
-                  className="changeDrumLoop"
-                  onClick={() => this.toggleNote('F1')}
-                ></div>
-                <div
-                  className="changeDrumLoop"
-                  onClick={() => this.toggleNote('G1')}
-                ></div>
-                <div
-                  className="changeDrumLoop"
-                  onClick={() => this.toggleNote('A1')}
-                ></div>
-                <div
-                  className="changeDrumLoop"
-                  onClick={() => this.toggleNote('B1')}
-                ></div>
-                <div
-                  className="changeDrumLoop"
-                  onClick={() => this.toggleNote('C2')}
-                ></div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="effectsBoard">

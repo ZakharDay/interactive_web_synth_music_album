@@ -14,7 +14,7 @@
     "rc-slider": "^9.3.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "tone": "^13.8.25",
+    "tone": "^14.7.39",
     "turbolinks": "^5.2.0",
     "unmute-ios-audio": "^3.0.0"
   },

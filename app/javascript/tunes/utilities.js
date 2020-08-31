@@ -1,4 +1,4 @@
-import Tone from 'tone'
+import * as Tone from 'tone'
 
 function channel(volume) {
   return new Tone.Channel({
@@ -6,7 +6,7 @@ function channel(volume) {
     volume: volume,
     mute: false,
     solo: false
-  }).toMaster()
+  }).toDestination()
 }
 
 export { channel }

@@ -1,4 +1,4 @@
-import Tone from 'tone'
+import * as Tone from 'tone'
 
 // The type of the oscillator.
 // Can be any of the basic types: sine, square, triangle, sawtooth.

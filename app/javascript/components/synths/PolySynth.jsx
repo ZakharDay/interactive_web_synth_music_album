@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React from 'react'
-import Tone from 'tone'
+import * as Tone from 'tone'
 
 import PlaySwitch from '../controls/PlaySwitch'
 import ToggleButton from '../controls/ToggleButton'
@@ -83,6 +83,8 @@ export default class PolySynth extends React.Component {
 
   render() {
     const { text, synth, instrument, on, togglePlay } = this.props
+    const { detune, portamento, oscillator, envelope } = instrument.get()
+    const { type, count, spread, phase, fadeIn } = oscillator
 
     const {
       attack,
@@ -92,22 +94,17 @@ export default class PolySynth extends React.Component {
       attackCurve,
       decayCurve,
       releaseCurve
-    } = instrument.voices[0].envelope
+    } = envelope
 
     // prettier-ignore
     const curveSet = ['linear', 'exponential', 'sine', 'cosine', 'bounce', 'ripple', 'step']
     const decayCurveSet = ['linear', 'exponential']
-
-    let synthsElements = instrument.voices.map((s, i) => {
-      return this.renderSynth(s, i)
-    })
+    const typeSet = ['sine', 'square', 'triangle', 'sawtooth', 'fatsawtooth']
 
     return (
       <div className="Synth">
         <ToggleButton text={text} on={on} handleClick={togglePlay} />
         <div className="controlsContainer">
-          {synthsElements}
-
           <div className="controlsRow">
             <h2>Envelope</h2>
 
