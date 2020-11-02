@@ -36,15 +36,60 @@ function autoFilter() {
 }
 
 function part(synth) {
-  let part = new Tone.Sequence(
+  const v = 1
+  const d = '1n'
+
+  const part = new Tone.Part(
     function (time, note) {
-      synth.triggerAttackRelease(note, '2n.', time)
+      synth.triggerAttackRelease(
+        note.noteName,
+        note.duration,
+        time,
+        note.velocity
+      )
     },
-    ['F1', 'A1', 'C2', 'E1'],
-    '1n'
+    [
+      {
+        time: '0:0:0',
+        noteName: 'F1',
+        velocity: v,
+        duration: d
+      },
+      {
+        time: '1:0:0',
+        noteName: 'A1',
+        velocity: v,
+        duration: d
+      },
+      {
+        time: '2:0:0',
+        noteName: 'C2',
+        velocity: v,
+        duration: d
+      },
+      {
+        time: '3:0:0',
+        noteName: 'E1',
+        velocity: v,
+        duration: d
+      }
+    ]
   )
 
+  part.loop = true
+  part.loopEnd = '4m'
+
   return part
+
+  // let part = new Tone.Sequence(
+  //   function (time, note) {
+  //     synth.triggerAttackRelease(note, '2n.', time)
+  //   },
+  //   ['F1', 'A1', 'C2', 'E1'],
+  //   '1n'
+  // )
+  //
+  // return part
 }
 
 export { synth, autoFilter, part }

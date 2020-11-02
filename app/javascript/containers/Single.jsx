@@ -56,13 +56,14 @@ let highSynthChannel = utilities.channel(-8)
 
 let kickDrum = drums.kickDrum()
 let snareHit = drums.snareHit()
-let highhat = drums.highhat().toMaster()
+let highhat = drums.highhat().toDestination()
 let snareMembrane = drums.snareMembrane()
-let snareEQ = new Tone.EQ3(-10, 0, -10).toMaster()
-// let convolver = new Tone.Convolver(samples.hall).toMaster()
-//
+let snareEQ = new Tone.EQ3(-10, 0, -10).toDestination()
+// let convolver = new Tone.Convolver(samples.hall).toDestination()
+
 // convolver.wet.value = 0.1
 // kickDrum.connect(convolver)
+kickDrum.toDestination()
 snareMembrane.chain(snareEQ)
 snareHit.chain(snareEQ)
 
@@ -129,31 +130,12 @@ highSynth.chain(
 
 let keysOctave = 3
 
-export default class Performance extends React.Component {
+export default class Single extends React.Component {
   constructor(props) {
     super(props)
 
     this.kickCircle = React.createRef()
     this.snareCircle = React.createRef()
-
-    _.bindAll(
-      this,
-      'nextMeasure',
-      'handleStart',
-      'handleKeydown',
-      'handleKeyup',
-      'setupDrums',
-      'toggleDrum',
-      'changeDrumLoop',
-      'changeSynthValue',
-      'setupEffect',
-      'toggleEffect',
-      'changeEffectWetValue',
-      'changeEffectValue',
-      'changeChannelValue',
-      'toggleChannelValue',
-      'toggleNote'
-    )
 
     // drumLoop1Kick = drumLoops.kick1(kickDrum, this.hitKickDrumCircle)
     // // prettier-ignore
@@ -302,193 +284,249 @@ export default class Performance extends React.Component {
     this.setupEffect('highSynthDistortion')
   }
 
-  nextMeasure(now) {
-    const { toggleDrum, changeDrumLoop } = this
-    const p = Tone.Transport.position
-    const regexBefore = /([\w]+)/
-    let measure = p.match(regexBefore)[1]
-    console.log('Next measure ' + measure)
+  // handleTogglePlay = () => {
+  //   let { room, instruments, transportIsOn, transportScheduleId } = this.state
+  //
+  //   if (transportIsOn) {
+  //     Tone.Transport.pause()
+  //     Tone.Transport.clear(transportScheduleId)
+  //     transportIsOn = false
+  //
+  //     // clearInterval(this.loopIntervallCall)
+  //   } else {
+  //     Tone.Transport.bpm.value = room.tempo
+  //     Tone.Transport.start()
+  //
+  //     // this.loopIntervalCall = setInterval(() => this.nextSixteenth(), 1000 / 30)
+  //
+  //     transportScheduleId = Tone.Transport.scheduleRepeat(
+  //       this.nextMeasure,
+  //       '1n'
+  //     )
+  //
+  //     transportIsOn = true
+  //   }
+  //
+  //   const oldInstruments = instruments
+  //   let newInstruments = []
+  //
+  //   instruments.forEach((instrument, i) => {
+  //     let newInstrument = {
+  //       id: instrument.id,
+  //       kind: instrument.kind,
+  //       name: instrument.name,
+  //       webaudioPart: this.updatePart(instrument, instrument),
+  //       parts: [...instrument.parts]
+  //     }
+  //
+  //     oldInstruments.forEach((oldInstrument, i) => {
+  //       if (instrument.id === oldInstrument.id) {
+  //         newInstrument.webaudio = oldInstrument.webaudio
+  //         newInstrument.channel = { webaudio: oldInstrument.channel.webaudio }
+  //         newInstrument.effects = oldInstrument.effects
+  //       }
+  //     })
+  //
+  //     newInstruments.push(newInstrument)
+  //   })
+  //
+  //   this.setState({
+  //     transportIsOn,
+  //     transportScheduleId,
+  //     instruments: newInstruments
+  //   })
+  // }
 
-    switch (measure) {
-      case '0':
-        // start light synth
-        lightSynthPart.mute = false
-        break
+  // nextMeasure(now) {
+  //   const { toggleDrum, changeDrumLoop } = this
+  //   const p = Tone.Transport.position
+  //   const regexBefore = /([\w]+)/
+  //   let measure = p.match(regexBefore)[1]
+  //   console.log('Next measure ' + measure)
+  //
+  //   switch (measure) {
+  //     case '0':
+  //       // start light synth
+  //       lightSynthPart.mute = false
+  //       break
+  //
+  //     case '16':
+  //       // start bass synth
+  //       bassSynthPart.mute = false
+  //       break
+  //
+  //     case '20':
+  //       // start hat loop 1
+  //       toggleDrum('hat')
+  //       break
+  //
+  //     case '24':
+  //       // start kick and snare
+  //       toggleDrum('kick')
+  //       toggleDrum('snare')
+  //       break
+  //
+  //     case '32':
+  //       // start solo synth
+  //       soloSynthPart.mute = false
+  //       break
+  //
+  //     case '44':
+  //       // stop solo synth
+  //       soloSynthPart.mute = true
+  //       // start kick loop 2
+  //       changeDrumLoop('kick', 1)
+  //       // start snare loop 2
+  //       changeDrumLoop('snare', 1)
+  //       break
+  //
+  //     case '56':
+  //       // start solo synth
+  //       soloSynthPart.mute = false
+  //       // start kick loop 1
+  //       changeDrumLoop('kick', 0)
+  //       // start snare loop 1
+  //       changeDrumLoop('snare', 0)
+  //       break
+  //
+  //     case '72':
+  //       // stop solo synth
+  //       soloSynthPart.mute = true
+  //       // start high synth
+  //       highSynthPart.mute = false
+  //       // start kick loop 2
+  //       changeDrumLoop('kick', 1)
+  //       // start snare loop 2
+  //       changeDrumLoop('snare', 1)
+  //       // how to make sound tuning
+  //       // ???
+  //       break
+  //
+  //     case '88':
+  //       // start kick loop 3
+  //       changeDrumLoop('kick', 2)
+  //       // start hat loop 2
+  //       changeDrumLoop('hat', 1)
+  //       break
+  //
+  //     case '96':
+  //       // stop kick
+  //       toggleDrum('kick')
+  //       // stop snare
+  //       toggleDrum('snare')
+  //       break
+  //
+  //     case '98':
+  //       // stop hat
+  //       toggleDrum('hat')
+  //       break
+  //
+  //     case '100':
+  //       // start snare loop 2
+  //       changeDrumLoop('snare', 1)
+  //       toggleDrum('snare')
+  //       break
+  //
+  //     case '104':
+  //       // stop high synth
+  //       highSynthPart.mute = true
+  //       // start solo synth
+  //       soloSynthPart.mute = false
+  //       // start kick loop 4
+  //       changeDrumLoop('kick', 3)
+  //       toggleDrum('kick')
+  //       // start hat loop 3
+  //       changeDrumLoop('hat', 2)
+  //       toggleDrum('hat')
+  //       break
+  //
+  //     case '120':
+  //       // start high synth
+  //       highSynthPart.mute = false
+  //       // stop solo synth
+  //       soloSynthPart.mute = true
+  //       // stop kick
+  //       toggleDrum('kick')
+  //       // stop snare
+  //       toggleDrum('snare')
+  //       // stop hat
+  //       toggleDrum('hat')
+  //       break
+  //
+  //     case '128':
+  //       // stop light synth
+  //       lightSynthPart.mute = true
+  //       // stop high synth
+  //       highSynthPart.mute = true
+  //       // how to move sliders
+  //       // ???
+  //       break
+  //
+  //     case '144':
+  //       // start solo synth
+  //       soloSynthPart.mute = false
+  //       // start light synth
+  //       lightSynthPart.mute = false
+  //       break
+  //
+  //     case '148':
+  //       // start kick loop 4
+  //       changeDrumLoop('kick', 3)
+  //       toggleDrum('kick')
+  //       // start snare loop 2
+  //       changeDrumLoop('snare', 1)
+  //       toggleDrum('snare')
+  //       // start hat loop 3
+  //       changeDrumLoop('hat', 2)
+  //       toggleDrum('hat')
+  //       break
+  //
+  //     case '164':
+  //       // start high synth
+  //       highSynthPart.mute = false
+  //       // stop solo synth
+  //       soloSynthPart.mute = true
+  //       // stop light synth
+  //       lightSynthPart.mute = true
+  //       // stop bass synth
+  //       bassSynthPart.mute = true
+  //       // stop kick
+  //       toggleDrum('kick')
+  //       // stop snare
+  //       toggleDrum('snare')
+  //       // stop hat
+  //       toggleDrum('hat')
+  //       break
+  //
+  //     case '166':
+  //       // start light synth
+  //       lightSynthPart.mute = false
+  //       break
+  //
+  //     case '168':
+  //       // stop high synth
+  //       highSynthPart.mute = true
+  //       // stop light synth
+  //       lightSynthPart.mute = true
+  //       // start hat loop 3
+  //       toggleDrum('hat')
+  //       break
+  //
+  //     case '169':
+  //       // stop hat
+  //       toggleDrum('hat')
+  //       break
+  //   }
+  // }
 
-      case '16':
-        // start bass synth
-        bassSynthPart.mute = false
-        break
-
-      case '20':
-        // start hat loop 1
-        toggleDrum('hat')
-        break
-
-      case '24':
-        // start kick and snare
-        toggleDrum('kick')
-        toggleDrum('snare')
-        break
-
-      case '32':
-        // start solo synth
-        soloSynthPart.mute = false
-        break
-
-      case '44':
-        // stop solo synth
-        soloSynthPart.mute = true
-        // start kick loop 2
-        changeDrumLoop('kick', 1)
-        // start snare loop 2
-        changeDrumLoop('snare', 1)
-        break
-
-      case '56':
-        // start solo synth
-        soloSynthPart.mute = false
-        // start kick loop 1
-        changeDrumLoop('kick', 0)
-        // start snare loop 1
-        changeDrumLoop('snare', 0)
-        break
-
-      case '72':
-        // stop solo synth
-        soloSynthPart.mute = true
-        // start high synth
-        highSynthPart.mute = false
-        // start kick loop 2
-        changeDrumLoop('kick', 1)
-        // start snare loop 2
-        changeDrumLoop('snare', 1)
-        // how to make sound tuning
-        // ???
-        break
-
-      case '88':
-        // start kick loop 3
-        changeDrumLoop('kick', 2)
-        // start hat loop 2
-        changeDrumLoop('hat', 1)
-        break
-
-      case '96':
-        // stop kick
-        toggleDrum('kick')
-        // stop snare
-        toggleDrum('snare')
-        break
-
-      case '98':
-        // stop hat
-        toggleDrum('hat')
-        break
-
-      case '100':
-        // start snare loop 2
-        changeDrumLoop('snare', 1)
-        toggleDrum('snare')
-        break
-
-      case '104':
-        // stop high synth
-        highSynthPart.mute = true
-        // start solo synth
-        soloSynthPart.mute = false
-        // start kick loop 4
-        changeDrumLoop('kick', 3)
-        toggleDrum('kick')
-        // start hat loop 3
-        changeDrumLoop('hat', 2)
-        toggleDrum('hat')
-        break
-
-      case '120':
-        // start high synth
-        highSynthPart.mute = false
-        // stop solo synth
-        soloSynthPart.mute = true
-        // stop kick
-        toggleDrum('kick')
-        // stop snare
-        toggleDrum('snare')
-        // stop hat
-        toggleDrum('hat')
-        break
-
-      case '128':
-        // stop light synth
-        lightSynthPart.mute = true
-        // stop high synth
-        highSynthPart.mute = true
-        // how to move sliders
-        // ???
-        break
-
-      case '144':
-        // start solo synth
-        soloSynthPart.mute = false
-        // start light synth
-        lightSynthPart.mute = false
-        break
-
-      case '148':
-        // start kick loop 4
-        changeDrumLoop('kick', 3)
-        toggleDrum('kick')
-        // start snare loop 2
-        changeDrumLoop('snare', 1)
-        toggleDrum('snare')
-        // start hat loop 3
-        changeDrumLoop('hat', 2)
-        toggleDrum('hat')
-        break
-
-      case '164':
-        // start high synth
-        highSynthPart.mute = false
-        // stop solo synth
-        soloSynthPart.mute = true
-        // stop light synth
-        lightSynthPart.mute = true
-        // stop bass synth
-        bassSynthPart.mute = true
-        // stop kick
-        toggleDrum('kick')
-        // stop snare
-        toggleDrum('snare')
-        // stop hat
-        toggleDrum('hat')
-        break
-
-      case '166':
-        // start light synth
-        lightSynthPart.mute = false
-        break
-
-      case '168':
-        // stop high synth
-        highSynthPart.mute = true
-        // stop light synth
-        lightSynthPart.mute = true
-        // start hat loop 3
-        toggleDrum('hat')
-        break
-
-      case '169':
-        // stop hat
-        toggleDrum('hat')
-        break
-    }
-  }
-
-  handleStart() {
-    unmuteAudio()
+  handleStart = () => {
+    // unmuteAudio()
     Tone.Transport.bpm.value = bpm
     // Tone.Transport.scheduleRepeat(this.nextMeasure, '1m')
     Tone.Transport.start()
+
+    // this.state.drums.kick.parts[0].mute = true
+    // this.state.drums.kick.parts[0].start()
 
     // this.state.drums.kick.parts.map((part) => {
     //   part.mute = true
@@ -506,22 +544,22 @@ export default class Performance extends React.Component {
     // })
 
     lightSynthPart.mute = true
-    // bassSynthPart.mute = true
-    // soloSynthPart.mute = true
-    // highSynthPart.mute = true
+    bassSynthPart.mute = true
+    soloSynthPart.mute = true
+    highSynthPart.mute = true
 
     lightSynthPart.start()
-    // bassSynthPart.start()
-    // soloSynthPart.start()
-    // highSynthPart.start()
+    bassSynthPart.start()
+    soloSynthPart.start()
+    highSynthPart.start()
 
-    // this.setupDrums('kick')
-    // this.setupDrums('snare')
-    // this.setupDrums('hat')
-    unmuteAudio()
+    this.setupDrums('kick')
+    this.setupDrums('snare')
+    this.setupDrums('hat')
+    // unmuteAudio()
   }
 
-  handleKeydown(e) {
+  handleKeydown = (e) => {
     console.log(e.key, e.code, e.keyCode)
 
     switch (e.keyCode) {
@@ -626,11 +664,11 @@ export default class Performance extends React.Component {
     }
   }
 
-  handleKeyup() {
+  handleKeyup = () => {
     this.stopNote()
   }
 
-  setupDrums(drumName) {
+  setupDrums = (drumName) => {
     let { part, on, parts } = this.state.drums[drumName]
 
     if (on == true) {
@@ -646,16 +684,20 @@ export default class Performance extends React.Component {
     }
   }
 
-  toggleDrum(drumName) {
+  toggleDrum = (drumName) => {
     let { drums } = this.state
     let { part, on, volume, parts } = drums[drumName]
 
     parts.map((p, i) => {
       if (on == true) {
         p.mute = true
+        // p.clear()
+        p.cancel()
+        p.stop()
       } else {
         if (i == part) {
           p.mute = false
+          p.start()
         }
       }
     })
@@ -672,7 +714,7 @@ export default class Performance extends React.Component {
     })
   }
 
-  changeDrumLoop(drumName, partNumber) {
+  changeDrumLoop = (drumName, partNumber) => {
     let { drums } = this.state
     let { part, on, volume, parts } = drums[drumName]
 
@@ -698,7 +740,7 @@ export default class Performance extends React.Component {
     })
   }
 
-  changeSynthValue(synthName, effectName, value) {
+  changeSynthValue = (synthName, effectName, value) => {
     // console.log('test', synthName, effectName, value)
 
     let synth = this.state[synthName]
@@ -754,7 +796,7 @@ export default class Performance extends React.Component {
     })
   }
 
-  setupEffect(effectName) {
+  setupEffect = (effectName) => {
     let { name, effect, wet, on } = this.state[effectName]
 
     effect.wet.value = on == true ? wet : 0
@@ -769,7 +811,7 @@ export default class Performance extends React.Component {
     })
   }
 
-  toggleEffect(effectName) {
+  toggleEffect = (effectName) => {
     let { name, effect, wet, on } = this.state[effectName]
 
     effect.wet.value = on == true ? 0 : wet
@@ -784,7 +826,7 @@ export default class Performance extends React.Component {
     })
   }
 
-  changeEffectWetValue(effectName, effectProperty, value) {
+  changeEffectWetValue = (effectName, effectProperty, value) => {
     let { name, effect, wet, on } = this.state[effectName]
 
     effect[effectProperty].value = on == true ? value : 0
@@ -800,7 +842,7 @@ export default class Performance extends React.Component {
     })
   }
 
-  changeEffectValue(effectName, effectProperty, value) {
+  changeEffectValue = (effectName, effectProperty, value) => {
     let { name, effect, wet, on } = this.state[effectName]
 
     if (effectProperty == 'order') {
@@ -842,7 +884,7 @@ export default class Performance extends React.Component {
     })
   }
 
-  changeChannelValue(channelName, valueName, value) {
+  changeChannelValue = (channelName, valueName, value) => {
     // console.log(channelName, valueName, value)
     let { name, channel, pan, volume, mute, solo } = this.state[channelName]
     let shouldComponentUpdate = false
@@ -877,7 +919,7 @@ export default class Performance extends React.Component {
     }
   }
 
-  toggleChannelValue(channelName, valueName) {
+  toggleChannelValue = (channelName, valueName) => {
     let { name, channel, pan, volume, mute, solo } = this.state[channelName]
     // channel[valueName] = !channel[valueName]
 
@@ -909,11 +951,11 @@ export default class Performance extends React.Component {
     })
   }
 
-  toggleNote(note) {
+  toggleNote = (note) => {
     lightSynth.triggerAttack(note, '16n')
   }
 
-  stopNote() {
+  stopNote = () => {
     lightSynth.triggerRelease()
   }
 

@@ -35,13 +35,17 @@ export default class Channel extends React.Component {
         <div className="controlsContainer">
           <div className="controlsRow">
             <h2>Volume {volume}</h2>
-            <Slider
-              min={-80}
-              max={6}
-              marks={{ 0: '0' }}
-              defaultValue={volume}
-              handle={(data) => changeChannelValue(name, 'volume', data.value)}
-            />
+            {
+              // <Slider
+              //   min={-80}
+              //   max={6}
+              //   marks={{ 0: '0' }}
+              //   defaultValue={volume}
+              //   handle={(data) =>
+              //     changeChannelValue(name, 'volume', data.value)
+              //   }
+              // />
+            }
 
             <h2>Pan</h2>
             <Knob

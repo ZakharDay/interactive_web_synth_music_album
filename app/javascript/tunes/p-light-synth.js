@@ -3,7 +3,7 @@ import * as Tone from 'tone'
 function synth() {
   return new Tone.PolySynth(Tone.Synth, {
     portamento: 0,
-    detune: 100,
+    detune: 0,
     oscillator: {
       type: 'fatsawtooth',
       count: 3,
